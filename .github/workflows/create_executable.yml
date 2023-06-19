@@ -1,43 +1,59 @@
 # creates executables for various operating systems using pyinstaller
-
 name: Create Executables
 
 on:
   push:
-    branches: [ "main" ]
+    tags:
+      - '*'
   workflow_dispatch:
 
+# set up the release tag
+env:
+  RELEASE_TAG: ${{ startsWith(github.ref, 'refs/tags/') && github.ref || 'test' }}
+  RELEASE_TITLE: ${{ startsWith(github.ref, 'refs/tags/') && github.ref || 'Test Release' }}
 jobs:
   build:
     # multi-os execution
     runs-on: ${{ matrix.os }}
     strategy:
-      fail-fast: false
+      fail-fast: true
       matrix:
         os: ['windows-latest', 'ubuntu-latest', 'macos-latest']
-
+    
+    # setup python
     steps:
     - uses: actions/checkout@v3
-    - uses: actions/setup-python@v3
+    - uses: actions/setup-python@v4
       with:
-        python-version: 3.9
+        python-version: 3.11
     - run: pip install .
-    - run: pip install pyinstaller
+
     # create executables using pyinstaller
-    - run: pyinstaller -w src/vims_exporter/vims_to_ics.py
-    # push each respective operating system's binaries
     - if: ${{ matrix.os == 'windows-latest' }}
-      run: cp -r dist/* bin/windows/.
+      run: pyinstaller specs/vims_to_ics_win.spec
     - if: ${{ matrix.os == 'macos-latest' }}
-      run: cp -r dist/* bin/macos/.
+      run: pyinstaller specs/vims_to_ics_mac.spec
     - if: ${{ matrix.os == 'ubuntu-latest' }}
-      run: cp -r dist/* bin/linux/.
-    # pull latest for simultaneous runs - keep local changes
-    - run: git pull -X ours
-    # push
-    - uses: EndBug/add-and-commit@v9
+      run: pyinstaller specs/vims_to_ics_ubuntu.spec
+
+    # Zip artifacts
+    - if: ${{ matrix.os == 'windows-latest' }}
+      run: Compress-Archive -Path dist/vims_to_ics* -Destination binaries-${{ matrix.os}}.zip
+    - if: ${{ matrix.os != 'windows-latest' }}
+      run: zip -r binaries-${{ matrix.os}}.zip dist/vims_to_ics*
+    
+    # Upload artifacts
+    - name: Archive artifacts
+      uses: actions/upload-artifact@v3
       with:
-        message: Adding ${{ matrix.os }} executables
-        committer_name: GitHub Actions
-        committer_email: actions@github.com
-        add: 'bin'
+        name: binaries-${{ matrix.os}}
+        path: binaries-${{ matrix.os}}.zip
+
+    # Create release
+    - uses: ncipollo/release-action@v1
+      with:
+        artifacts: "binaries-${{ matrix.os}}.zip"
+        name: ${{ env.RELEASE_TITLE }}
+        tag: ${{ env.RELEASE_TAG }}
+        allowUpdates: true
+        token: ${{ secrets.GITHUB_TOKEN }}

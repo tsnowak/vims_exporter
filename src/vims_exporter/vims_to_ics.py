@@ -14,7 +14,6 @@ from PyQt6.QtWidgets import (
     QMainWindow,
     QPushButton,
 )
-from qtwidgets import PasswordEdit
 from selenium import webdriver
 from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.chrome.options import Options
@@ -54,9 +53,10 @@ class MainWindow(QMainWindow):
         self.w_username.setGeometry(125, 90, 200, 30)
 
         # password
+        # TODO: make it passwordy
         self.w_password_label = QLabel("VIMS Password: ", self)
         self.w_password_label.move(10, 130)
-        self.w_password = PasswordEdit(show_visibility=True, parent=self)
+        self.w_password = QLineEdit("", self)
         self.w_password.setGeometry(125, 130, 200, 30)
 
         # output path
