@@ -8,6 +8,7 @@ on:
 
 jobs:
   build:
+    # multi-os execution
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -21,5 +22,19 @@ jobs:
         python-version: 3.9
     - run: pip install .
     - run: pip install pyinstaller
+    # create executables using pyinstaller
     - run: pyinstaller -w src/vims_exporter/vims_to_ics.py
-    
+    # push each respective operating system's binaries
+    - if: ${{ matrix.os == 'windows-latest' }}
+      run: |
+        cp dist/* bin/windows/.
+        git add bin; git commit -m "windows binaries"; git push
+    - if: ${{ matrix.os == 'macos-latest' }}
+      run: |
+        cp dist/* bin/macos/.
+        git add bin; git commit -m "macos binaries"; git push
+    - if: ${{ matrix.os == 'ubuntu-latest' }}
+      run: |
+        cp dist/* bin/linux/.
+        git add bin; git commit -m "linux binaries"; git push
+      
