@@ -1,0 +1,24 @@
+# creates executables for various operating systems using pyinstaller
+
+name: Create Executables
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: ['windows-latest', 'ubuntu-latest', 'macos-latest']
+
+    steps:
+    - uses: actions/checkout@v3
+    - uses: actions/setup-python@v3
+      with:
+        python-version: 3.9
+    - run: pip install -r requirements.txt pyinstaller
+    - run: pyinstaller -w src/vims_exporter/vims_to_ics.py
+    
