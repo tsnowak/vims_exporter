@@ -1,4 +1,3 @@
-import os
 from distutils.core import setup
 from pathlib import Path
 
@@ -28,10 +27,8 @@ setup(
         "validators",
         "selenium",
         "icalendar",
-        f"qtwidgets @ file://localhost/{os.getcwd()}/deps/python-qtwidgets#egg=qtwidgets",  # local qtwidgets version fixing pyside2 requirements and MANIFEST.in for .svg files
+        "pyinstaller"
     ],
-    # install pyinstaller for development - pip install .[dev]
-    extras_require={"dev": ["pyinstaller"]},
     # include .svg during install
     include_package_data=True,
     # ability to run vims_to_ics in terminal
