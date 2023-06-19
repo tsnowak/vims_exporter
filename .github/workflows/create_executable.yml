@@ -27,14 +27,14 @@ jobs:
     # push each respective operating system's binaries
     - if: ${{ matrix.os == 'windows-latest' }}
       run: |
-        cp dist/* bin/windows/.
+        cp -r dist/* bin/windows/.
         git add bin; git commit -m "windows binaries"; git push
     - if: ${{ matrix.os == 'macos-latest' }}
       run: |
-        cp dist/* bin/macos/.
+        cp -r dist/* bin/macos/.
         git add bin; git commit -m "macos binaries"; git push
     - if: ${{ matrix.os == 'ubuntu-latest' }}
       run: |
-        cp dist/* bin/linux/.
+        cp -r dist/* bin/linux/.
         git add bin; git commit -m "linux binaries"; git push
       
