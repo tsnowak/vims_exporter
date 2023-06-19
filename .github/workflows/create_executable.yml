@@ -5,6 +5,7 @@ name: Create Executables
 on:
   push:
     branches: [ "main" ]
+  workflow_dispatch:
 
 jobs:
   build:
