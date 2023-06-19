@@ -33,7 +33,7 @@ jobs:
     - if: ${{ matrix.os == 'ubuntu-latest' }}
       run: cp -r dist/* bin/linux/.
     # pull latest for simultaneous runs - keep local changes
-    - run: git pull --rebase origin main
+    - run: git pull -X ours
     # push
     - uses: EndBug/add-and-commit@v9
       with:
