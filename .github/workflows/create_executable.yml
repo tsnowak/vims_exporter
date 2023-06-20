@@ -30,7 +30,7 @@ jobs:
     # hack - with platform flag
     - if: ${{ matrix.os == 'macos-latest' }}
       run: |
-        pip download --platform arm64 --only-binary=:all: PyQt6_Qt6-6.5.1-py3-none-macosx_11_0_arm64.whl
+        pip download --platform arm64 --only-binary=:all: PyQt6-Qt6>=6.5.0
 
     # create executables using pyinstaller
     - if: ${{ matrix.os == 'windows-latest' }}
