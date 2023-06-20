@@ -16,9 +16,9 @@ jobs:
     # multi-os execution
     runs-on: ${{ matrix.os }}
     strategy:
-      fail-fast: true
+      fail-fast: false
       matrix:
-        os: ['windows-latest', 'ubuntu-latest', 'macos-latest']
+        os: ['windows-latest', 'ubuntu-latest', 'macos-latest', 'self-hosted']
     
     # setup python
     steps:
@@ -27,36 +27,42 @@ jobs:
       with:
         python-version: 3.11
     - run: pip install .
-    # hack - with platform flag
-    - if: ${{ matrix.os == 'macos-latest' }}
-      run: |
-        pip download --platform=macosx_11_0_arm64 --only-binary=:all: PyQt6-Qt6>=6.5.0
 
     # create executables using pyinstaller
     - if: ${{ matrix.os == 'windows-latest' }}
       run: pyinstaller specs/vims_to_ics_win.spec
+      env:
+        ARCH: "windows-x86"
     - if: ${{ matrix.os == 'macos-latest' }}
       run: pyinstaller specs/vims_to_ics_mac.spec
+      env:
+        ARCH: "macos-x86"
     - if: ${{ matrix.os == 'ubuntu-latest' }}
       run: pyinstaller specs/vims_to_ics_ubuntu.spec
+      env:
+        ARCH: "linux-x86"
+    - if: ${{ matrix.os == 'self-hosted' }}
+      run: pyinstaller specs/vims_to_ics_mac.spec
+      env:
+        ARCH: "macos-arm64"
 
     # Zip artifacts
     - if: ${{ matrix.os == 'windows-latest' }}
-      run: Compress-Archive -Path dist/vims_to_ics* -Destination binaries-${{ matrix.os}}.zip
+      run: Compress-Archive -Path dist/vims_to_ics* -Destination binaries-${{ env.ARCH }}.zip
     - if: ${{ matrix.os != 'windows-latest' }}
-      run: zip -r binaries-${{ matrix.os}}.zip dist/vims_to_ics*
+      run: zip -r binaries-${{ env.ARCH }}.zip dist/vims_to_ics*
     
     # Upload artifacts
     - name: Archive artifacts
       uses: actions/upload-artifact@v3
       with:
-        name: binaries-${{ matrix.os}}
-        path: binaries-${{ matrix.os}}.zip
+        name: binaries-${{ env.ARCH }}
+        path: binaries-${{ env.ARCH }}.zip
 
     # Create release
     - uses: ncipollo/release-action@v1
       with:
-        artifacts: "binaries-${{ matrix.os}}.zip"
+        artifacts: "binaries-${{ env.ARCH }}.zip"
         name: ${{ env.RELEASE_TITLE }}
         tag: ${{ env.RELEASE_TAG }}
         allowUpdates: true
