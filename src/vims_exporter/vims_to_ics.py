@@ -4,8 +4,8 @@ from datetime import datetime
 
 import validators
 from icalendar import Calendar, Event
-from PyQt6.QtCore import QDateTime, QSize
-from PyQt6.QtWidgets import (
+from PyQt5.QtCore import QDateTime, QSize
+from PyQt5.QtWidgets import (
     QApplication,
     QDateEdit,
     QFileDialog,

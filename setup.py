@@ -23,7 +23,7 @@ setup(
     package_dir={"": "src"},
     packages=["vims_exporter"],
     install_requires=[
-        "pyqt6",
+        "pyqt5",
         "validators",
         "selenium",
         "icalendar",

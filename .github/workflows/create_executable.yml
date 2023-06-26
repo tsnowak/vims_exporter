@@ -8,17 +8,14 @@ on:
   workflow_dispatch:
 
 # set up the release tag
-env:
-  RELEASE_TAG: ${{ startsWith(github.ref, 'refs/tags/') && github.ref || 'test' }}
-  RELEASE_TITLE: ${{ startsWith(github.ref, 'refs/tags/') && github.ref || 'Test Release' }}
 jobs:
   build:
     # multi-os execution
     runs-on: ${{ matrix.os }}
     strategy:
-      fail-fast: false
+      fail-fast: true
       matrix:
-        os: ['windows-latest', 'ubuntu-latest', 'macos-latest', 'self-hosted']
+        os: ['windows-latest', 'ubuntu-latest', 'macos-latest']
     
     # setup python
     steps:
@@ -27,43 +24,35 @@ jobs:
       with:
         python-version: 3.11
     - run: pip install .
-
     # create executables using pyinstaller
     - if: ${{ matrix.os == 'windows-latest' }}
       run: pyinstaller specs/vims_to_ics_win.spec
-      env:
-        ARCH: "windows-x86"
     - if: ${{ matrix.os == 'macos-latest' }}
       run: pyinstaller specs/vims_to_ics_mac.spec
-      env:
-        ARCH: "macos-x86"
     - if: ${{ matrix.os == 'ubuntu-latest' }}
       run: pyinstaller specs/vims_to_ics_ubuntu.spec
-      env:
-        ARCH: "linux-x86"
-    - if: ${{ matrix.os == 'self-hosted' }}
-      run: pyinstaller specs/vims_to_ics_mac.spec
-      env:
-        ARCH: "macos-arm64"
 
     # Zip artifacts
     - if: ${{ matrix.os == 'windows-latest' }}
-      run: Compress-Archive -Path dist/vims_to_ics* -Destination binaries-${{ env.ARCH }}.zip
-    - if: ${{ matrix.os != 'windows-latest' }}
-      run: zip -r binaries-${{ env.ARCH }}.zip dist/vims_to_ics*
-    
+      run: Compress-Archive -Path dist/vims_to_ics* -Destination binaries-${{ matrix.os}}.zip
+    - if: ${{ matrix.os == 'ubuntu-latest' }}
+      run: zip -r binaries-${{ matrix.os}}.zip dist/vims_to_ics*;
+    - if: ${{ matrix.os == 'macos-latest' }}
+      run: zip -r binaries-${{ matrix.os}}.zip dist/vims_to_ics.app;
+
+
     # Upload artifacts
     - name: Archive artifacts
       uses: actions/upload-artifact@v3
       with:
-        name: binaries-${{ env.ARCH }}
-        path: binaries-${{ env.ARCH }}.zip
+        name: binaries-${{ matrix.os}}
+        path: binaries-${{ matrix.os}}.zip
 
     # Create release
     - uses: ncipollo/release-action@v1
       with:
-        artifacts: "binaries-${{ env.ARCH }}.zip"
-        name: ${{ env.RELEASE_TITLE }}
-        tag: ${{ env.RELEASE_TAG }}
-        allowUpdates: true
+        artifacts: "binaries-${{ matrix.os}}.zip"
+        name: 'Release'
+        tag: 'release'
         token: ${{ secrets.GITHUB_TOKEN }}
+        allowUpdates: true
