@@ -101,6 +101,7 @@ class MainWindow(QMainWindow):
     ):
         options = Options()
         options.add_argument("--headless=new")
+        options.add_experimental_option("excludeSwitches", ["enable-logging"])
         driver = webdriver.Chrome(options=options)
         return driver
 
@@ -201,6 +202,7 @@ class MainWindow(QMainWindow):
         output_path = self.w_output.text()
 
         # verify URL
+        self._status("Checking options...")
         url, ok = check_url(url)
         if not ok:
             self._status("Bad URL.")
@@ -211,10 +213,12 @@ class MainWindow(QMainWindow):
             self._status("Invalid output path.")
             return None
 
+        self._status("Loading webpage...")
         self.driver = self.create_driver()
         if not self.login(url, username, password):
             return None
 
+        self._status("Parsing calendar...")
         events = self.parse_vims_calendar(url, start_date, end_date)
         if len(events) == 0:
             self._status("No events.")
