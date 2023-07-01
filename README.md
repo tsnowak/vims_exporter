@@ -18,7 +18,7 @@ The [Volunteering Integrated Management System (VIMS)](http://www.publicsafetysg
 
 To use this program:
 
-1. Download the "binaries" for your operating system
+1. [Download the "binaries" for your operating system](https://github.com/tsnowak/vims_exporter/releases/tag/release)
 2. Unzip the package
 3. Open the `dist` folder, and double click the executable file:
 
