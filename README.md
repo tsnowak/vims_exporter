@@ -29,9 +29,9 @@ To use this program:
 4. Your computer will say it's not from a trusted publisher. Open it anyways.
 5. A GUI should appear once you've lanuched the program. Enter in:
 
-- The VIMs URL for your team
+- The VIMs login page URL for your team (eg mysarteam.myvims5.com)
 - The date range of events you want to export
 - Your VIMS username and password
 - And select an output folder on your computer at which to save the `vims_cal.ics` file
 
-6. Then click run! It will take a moment to perform magic in the background, but if you see "Success!" in the status pane, the `vims_cal.ics` file should be in your selected output file path.
+6. Then click `Download .ics!` It will take a moment to perform magic in the background, but if you see "Success!" in the status pane, the `vims_cal.ics` file should be in your selected output file path.
